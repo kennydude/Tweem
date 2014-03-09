@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>setup tweem</title>
+	<link rel="stylesheet" href="style.css" />
+	<link rel="stylesheet" href="animate.css" />
+	<style>
+		body{
+			background: #333;
+			color: #FFF;
+		}
+		.option{
+			padding: 10px;
+			cursor: pointer;
+			background: #222;
+			margin-top: 5px;
+		}
+		.optionBox{
+			background: #444;
+			padding: 10px;
+		}
+		label, label input{
+			margin-top: 5px;
+			display: block;
+		}
+		input{
+			width: 100%;
+		}
+		#loading{
+			position: fixed;
+			left:0;right:0;bottom:0;top:0;
+			display: none;
+			height: 100%;
+			width: 100%;
+		}
+		#loading .r{
+			display: table-cell;
+			vertical-align: middle;
+			text-align: center;
+		}
+		#whatIsGoingOn{
+			margin-top: 4px;
+		}
+		.rotating{
+			-webkit-animation:spin 4s linear infinite;
+		}
+		.option.error{
+			background: #691818;
+		}
+		@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }
+	</style>
+
+	<script src="../bower_components/platform/platform.js"></script>
+</head>
+<body>
+
+<div id="firstScreen">
+	<h1>tweem</h1>
+	<p>Welcome to Tweem. To use Tweem, you must add a twitter account</p>
+
+	<div class="option error" id="errorMsg">
+		Apologies, there seems to be a problem doing that
+	</div>
+
+	<div class="option" id="addViaTwitterForMac">Add via Twitter for Mac</div>
+	<div class="optionBox" id="twitterForMac">
+		<p>This will add the account via Twitter for Mac. Pressing continue will
+		pop up with a box asking for access to the keychain.</p>
+		<p>You only have to allow once (do not press "Allow Always")</p>
+		<button id="addTFM">Continue</button>
+	</div>
+
+	<div class="option" id="addManually">Add account manually</div>
+	<div class="optionBox" id="manual">
+		<p>Please get your credentials ready</p>
+		<label>
+			Consumer Key:
+			<input type="text" id="consumerKey" />
+		</label>
+		<label>
+			Consumer Secret:
+			<input type="text" id="consumerSecret" />
+		</label>
+		<label>
+			Access Token:
+			<input type="text" id="accessToken" />
+		</label>
+		<label>
+			Access Secret:
+			<input type="text" id="accessSecret" />
+		</label>
+		<button id="verify">Verify</button>
+	</div>
+</div>
+<div id="loading">
+	<div class="r">
+		<img src="icons/load.png" class="rotating" />
+		<div id="whatIsGoingOn">?</div>
+	</div>
+</div>
+
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script src="accounts.js"></script>
+<script>
+	function showLoader(msg){
+		$("#whatIsGoingOn").html(msg);
+		$("#loading").css("display", "table").fadeIn();
+		$("#firstScreen").fadeOut();
+	}
+
+	function hideLoader(){
+		$("#loading").fadeOut();
+		$("#firstScreen").fadeIn();
+	}
+
+	$("#twitterForMac, #manual, #errorMsg").hide();
+	$("#addManually").click(function(){
+		$("#twitterForMac").hide();
+		$("#manual").show();
+	});
+	$("#addViaTwitterForMac").click(function(){
+		$("#twitterForMac").show();
+		$("#manual").hide();
+	});
+
+	$("#addTFM").click(function(){
+		showLoader("Getting details from Twitter for Mac");
+
+		var spawn = require('child_process').spawn;
+		var security = spawn("/usr/bin/security", [ 'find-generic-password', '-s', 'com.twitter.twitter-mac', '-g' ]);
+		var keychain = '';
+		var password = '';
+
+		security.stdout.on('data', function(d) {
+			keychain += d.toString();
+		});
+
+		// For better or worse, the last line (containing the actual password) is actually written to stderr instead of stdout.
+		// Reference: http://blog.macromates.com/2006/keychain-access-from-shell/
+		security.stderr.on('data', function(d) {
+			password += d.toString();
+		});
+
+		security.on('exit', function(code, signal) {
+			/* parse result */
+			keychain = keychain.split("\n");
+			var accessToken = "";
+			for(var x in keychain){
+				var line = keychain[x];
+				if(line.indexOf('"acct"<blob>="') != -1){ // Ding
+					var i = line.lastIndexOf('"');
+					accessToken = line.substring( line.lastIndexOf('"', i-1)+1, i );
+				}
+			}
+			var i = password.lastIndexOf('"');
+			var accessSecret = password.substring( password.lastIndexOf('"', i-1)+1, i );
+
+			if(accessSecret.trim() == ""){
+				return hideLoader();
+			}
+
+			$("#whatIsGoingOn").html("Verifying details");
+			addAccount({ /* this will be our dirty little secret */
+				consumer_key : "3rJOl1ODzm9yZy63FACdg",
+				consumer_secret : "5jPoQ5kQvMJFDYRNE8bQ4rHuds4xJqhvgNJM4awaE8",
+				access_token : accessToken,
+				access_secret : accessSecret,
+				official : true
+			}, function(success, msg){
+				if(!success){
+					$("#errorMsg").show();
+					hideLoader();
+				} else{
+					localStorage['setup'] = true;
+					document.location.href = "../app.html";
+				}
+			});
+		});
+	});
+
+	var os = require("os");
+	if(os.platform() != "darwin"){
+		// Can't do it
+		$("#addViaTwitterForMac").hide();
+	}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Tweem",
+  "version": "0.0.1",
+  "authors": [
+    "Joe Simpson <headbangerkenny@googlemail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~0.2.1",
+    "jquery": "~2.1.0"
+  }
+}

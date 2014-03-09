@@ -1,0 +1,13 @@
+{
+	"name": "tweem",
+	"version": "0.0.1",
+	"dependencies" : {
+		"twitter" : "0.2.xs"
+	},
+	"main" : "app.html",
+	"window" : {
+		"toolbar" : false,
+		"min-width" : 300,
+		"width" : 300
+	}
+}

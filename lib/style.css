@@ -1,0 +1,81 @@
+body{
+    font-family: "Lucida Grande", sans-serif;
+    font-size: 12px;
+}
+*{
+    box-sizing: border-box;
+}
+
+.toolbox{
+    background: #333;
+    color: #FFF;
+    width: 60px;
+    min-width: 55px;
+    text-align: center;
+    padding-top: 10px;
+    font-size: 25px;
+    z-index: 3;
+    position: fixed;
+    bottom: 0; top: 0; left: 0; right: 0;
+    -webkit-user-select: none;
+}
+.toolbox .button{
+    padding-top: 10px;
+    cursor: pointer;
+    border: 4px solid #333;
+    line-height: 1;
+    font-size: 25px;
+}
+.toolbox .button.active{
+    border-right: 4px solid #0066CC;
+}
+.main{
+    display: flex;
+    align-items: stretch;
+    position: fixed;
+    bottom: 0; top: 0; left: 0; right: 0;
+}
+.avatar{
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+}
+.tweets{
+    overflow-y: scroll;
+    position: fixed;
+    background: #FEFEFE;
+    top: 0;left:60px;right:0;bottom:0;
+}
+
+/* tweet */
+.tweetrow{
+    display: flex;
+}
+.tweet{
+    padding: 4px;
+    border-bottom: 1px solid #CCC;
+    word-break: break-word;
+}
+.tweet .message{
+    padding-left: 4px;
+}
+.tweet .subtle{
+    float: right;
+    color: #CCC;
+}
+/* bum */
+.bum{
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 60px;
+    border-top: 1px solid #111;
+    display: flex;
+    align-items: stretch;
+}
+.bum > div{
+    width: 50%;
+    cursor: pointer;
+}
+#cog{
+    border-left: 1px solid #111;
+}

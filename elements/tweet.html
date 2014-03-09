@@ -1,0 +1,46 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="text.html" />
+<polymer-element name="tweem-tweet" attributes="tweet">
+	<template>
+		<div class="tweet">
+			<div class="tweetrow">
+				<img class="avatar" src="{{ tweet.user.profile_image_url }}" />
+				<div class="message">
+					<div class="title">
+						<span class="subtle">
+							5h
+						</span>
+						<a href="http://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.name }}</a>:
+					</div>
+					<tweem-text id="text"></tweem-text>
+				</div>
+			</div>
+			<div class="sub">
+				via <span id="source"></span>
+			</div>
+			<template if="{{ retweeted }}">
+				<div class="retweet">
+					Retweeted by {{ this.retweeter.name }}
+				</div>
+			</template>
+		</div>
+	</template>
+	<script>
+		Polymer('tweem-tweet', {
+			tweetChanged: function() {
+				if(this.tweet.retweeted_status){
+					this.retweeted = true;
+					this.retweeter = this.tweet.user;
+					this.tweet = this.tweet.retweeted_status;
+				}
+
+				this.$.source.innerHTML = this.tweet.source;
+
+				// conga line!
+				var text = this.$.text;
+				text.text = this.tweet.text;
+				text.entities = this.tweet.entities;
+			}
+		});
+	</script>
+</polymer-element>

@@ -1,0 +1,70 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="tweem-text" attributes="text entities">
+	<template>
+		<span id="text"></span>
+	</template>
+	<script>
+		function escapeHtml(unsafe) {
+			return unsafe
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;")
+					.replace(/'/g, "&#039;");
+		}
+		function compareNumbers(a, b) {
+			return a - b;
+		}
+
+		Polymer('tweem-text', {
+			entitiesChanged : function(){
+				var x = {};
+
+				for(var i in this.entities.urls){
+					var link = this.entities.urls[i];
+					x[link.indices[0]] = '<a class="replace external" data-content="'+link.display_url+'" href="'+link.expanded_url+'">';
+					x[link.indices[1]] = '</a>';
+				}
+				for(var i in this.entities.user_mentions ){
+					var link = this.entities.user_mentions [i];
+					x[link.indices[0]] = '<a class="profile" title="'+link.name+'" href="http://twitter.com/'+link.screen_name+'">';
+					x[link.indices[1]] = '</a>';
+				}
+
+				var keys = Object.keys(x),
+					i, len = keys.length;
+				keys.sort(compareNumbers);
+
+				var upto = 0;
+				var o = "";
+				for (i = 0; i < len; i++) {
+					var k = keys[i], part = x[k];
+					o += this.text.substring(upto, k);
+					o += part;
+					upto = k;
+				}
+				o += this.text.substring(upto);
+
+				this.$.text.innerHTML = o;
+				console.log(o, x,keys);
+
+				// Do some trickery here :)
+				var els = this.$.text.getElementsByClassName("external");
+				for(var i = 0; i < els.length; i++){
+					var el = els[i];
+					$(el).click(function(){
+						require('nw.gui').Shell.openExternal( $(this).attr("href") );
+						return false;
+					});
+				}
+				// Replace
+				var els = this.$.text.getElementsByClassName("replace");
+				for(var i = 0; i < els.length; i++){
+					var el = els[i];
+					el.innerHTML = el.getAttribute("data-content")
+				}
+			},
+			entities : {}
+		});
+	</script>
+</polymer-element>
