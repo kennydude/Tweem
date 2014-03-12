@@ -1,0 +1,46 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="text.html" />
+<link rel="import" href="tweet.html" />
+<polymer-element name="tweem-user" attributes="user tweets">
+	<template>
+		<div class="user-header">
+			<img class="avatar" src="{{ user.profile_image_url }}" />
+			<div class="title">
+				<strong>{{ user.name }}</strong>
+				<br/>
+				@{{ user.screen_name }}
+			</div>
+		</div>
+		<div class="tabs">
+
+		</div>
+
+		<div class="profile">
+			<div class="bio">
+				<tweem-text id="bio"></tweem-text>
+			</div>
+			<div class="url">
+				<tweem-text id="url"></tweem-text>
+			</div>
+		</div>
+		<div id="userTweets">
+			<template repeat="{{ tweet in tweets }}">
+				<tweem-tweet tweet="{{ tweet }}" />
+			</template>
+		</div>
+	</template>
+	<script>
+		var twt = require("twitter-text");
+		Polymer("tweem-user",{
+			userChanged : function(){
+				var self = this;
+
+				this.$.bio.text = this.user.description;
+				this.$.bio.entities = this.user.entities.description;
+
+				this.$.url.text = this.user.url;
+				this.$.url.entities = this.user.entities.url;
+			}
+		});
+	</script>
+</polymer-element>

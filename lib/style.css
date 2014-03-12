@@ -79,3 +79,18 @@ body{
 #cog{
     border-left: 1px solid #111;
 }
+/* composer */
+textarea{
+    width: 100%;
+    min-height: 100px;
+}
+.tweet-composer{
+    display: flex;
+    width: 100%;
+}
+.tweet-composer .account-chooser{
+    min-width: 60px;
+}
+.tweet-composer .composer{
+    width: 100%;
+}

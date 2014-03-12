@@ -123,6 +123,25 @@
 		$("#manual").hide();
 	});
 
+	$("#verify").click(function(){
+		showLoader("Verifying");
+		addAccount({
+			consumer_key : $("#consumerKey").val(),
+			consumer_secret : $("#consumerSecret").val(),
+			access_token : $("#accessToken").val(),
+			access_secret : $("#accessSecret").val(),
+			official : false
+		}, function(success, msg){
+			if(!success){
+				$("#errorMsg").show();
+				hideLoader();
+			} else{
+				localStorage['setup'] = true;
+				document.location.href = "../app.html";
+			}
+		});
+	});
+
 	$("#addTFM").click(function(){
 		showLoader("Getting details from Twitter for Mac");
 

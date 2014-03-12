@@ -27,7 +27,7 @@
 				}
 				for(var i in this.entities.user_mentions ){
 					var link = this.entities.user_mentions [i];
-					x[link.indices[0]] = '<a class="profile" title="'+link.name+'" href="http://twitter.com/'+link.screen_name+'">';
+					x[link.indices[0]] = '<a class="profile" data-id="'+link.id_str+'" title="'+link.name+'" href="http://twitter.com/'+link.screen_name+'">';
 					x[link.indices[1]] = '</a>';
 				}
 
@@ -46,14 +46,23 @@
 				o += this.text.substring(upto);
 
 				this.$.text.innerHTML = o;
-				console.log(o, x,keys);
+				var self = this;
 
 				// Do some trickery here :)
 				var els = this.$.text.getElementsByClassName("external");
 				for(var i = 0; i < els.length; i++){
 					var el = els[i];
-					$(el).click(function(){
-						require('nw.gui').Shell.openExternal( $(this).attr("href") );
+					el.addEventListener("click", function(e){
+						e.preventDefault();
+						require('nw.gui').Shell.openExternal( e.target.getAttribute("href") );
+					});
+				}
+				var els = this.$.text.getElementsByClassName("profile");
+				for(var i = 0; i < els.length; i++){
+					var el = els[i];
+					el.addEventListener("click", function(e){
+						e.preventDefault();
+						self.fire("openUser", e.target.getAttribute("data-id") );
 						return false;
 					});
 				}

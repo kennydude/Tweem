@@ -2,7 +2,8 @@
 	"name": "tweem",
 	"version": "0.0.1",
 	"dependencies" : {
-		"twitter" : "0.2.xs"
+		"twitter" : "0.2.x",
+		"twitter-text" : "1.8.x"
 	},
 	"main" : "app.html",
 	"window" : {

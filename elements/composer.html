@@ -1,0 +1,35 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="tweem-composer" attributes="">
+	<template>
+		<div class="tweet-composer">
+			<div class="account-chooser">
+				<img class="avatar" id="currentAvatar" />
+				<!-- todo: complete -->
+			</div>
+			<div class="composer">
+				<textarea id="text"></textarea>
+				<div class="counter" id="counter">140</div>
+			</div>
+		</div>
+	</template>
+	<script>
+		var twt = require("twitter-text");
+		Polymer("tweem-composer",{
+			ready : function(){
+				var self = this;
+				this.$.text.onkeyup = function(e){
+					self.$.counter.innerHTML = 140 - twt.getTweetLength(this.value);
+				};
+				$(this.$.text).on("keydown", function(e){
+					if(e.keyCode == 91 && (e.metaKey || e.ctrlKey)){
+						console.log("SEND via Keyboard");
+					}
+				});
+
+				setTimeout(function(){
+					self.$.text.focus();
+				}, 100);
+			}
+		});
+	</script>
+</polymer-element>

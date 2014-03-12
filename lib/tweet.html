@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>New Tweet</title>
+	<link rel="stylesheet" href="style.css" />
+	<link rel="stylesheet" href="animate.css" />
+
+	<script src="../bower_components/platform/platform.js"></script>
+	<link rel="import" href="../elements/composer.html">
 </head>
 <body>
-
-
+<button onclick="document.location.href=document.location">refresh(DEBUG)</button>
+<tweem-composer></tweem-composer>
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 <script>
 	window.opener.postMessage("The user is 'bob' and the password is 'secret'",
 			"file://");

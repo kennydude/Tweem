@@ -4,13 +4,13 @@
 	<template>
 		<div class="tweet">
 			<div class="tweetrow">
-				<img class="avatar" src="{{ tweet.user.profile_image_url }}" />
+				<img id="avatar" class="avatar" src="{{ tweet.user.profile_image_url }}" />
 				<div class="message">
 					<div class="title">
 						<span class="subtle">
 							5h
 						</span>
-						<a href="http://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.name }}</a>:
+						<a id="username" href="http://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.name }}</a>:
 					</div>
 					<tweem-text id="text"></tweem-text>
 				</div>
@@ -20,13 +20,15 @@
 			</div>
 			<template if="{{ retweeted }}">
 				<div class="retweet">
-					Retweeted by {{ this.retweeter.name }}
+					Retweeted by {{ retweeter.screen_name }}
 				</div>
 			</template>
 		</div>
 	</template>
 	<script>
 		Polymer('tweem-tweet', {
+			retweeter : null,
+			retweeted : false,
 			tweetChanged: function() {
 				if(this.tweet.retweeted_status){
 					this.retweeted = true;
@@ -40,6 +42,18 @@
 				var text = this.$.text;
 				text.text = this.tweet.text;
 				text.entities = this.tweet.entities;
+			},
+			ready : function(){
+				var self = this;
+				var openUserPage = function(){
+					self.fire("openUser", self.tweet.user.id_str);
+				};
+
+				this.$.avatar.onclick = openUserPage;
+				this.$.username.onclick = openUserPage;
+				this.$.text.addEventListener("openUser", function(e){
+					self.fire("openUser", e.detail);
+				});
 			}
 		});
 	</script>
