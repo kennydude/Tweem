@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"dependencies" : {
 		"twitter" : "0.2.x",
-		"twitter-text" : "1.8.x"
+		"twitter-text" : "1.8.x",
+		"async" : "0.2.x"
 	},
 	"main" : "app.html",
 	"window" : {

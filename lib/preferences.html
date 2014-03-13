@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Preferences</title>
+	<link rel="stylesheet" href="style.css" />
+	<link rel="stylesheet" href="animate.css" />
+	<style>
+		#tabs{
+			background: #CCC;
+			padding: 0;
+			text-align: center;
+			position: fixed;
+			top: 0;left:0;right:0;
+		}
+		#tabHolder{
+			position: relative;
+			height: 80px;;
+		}
+		#tabs li{
+			display: inline-block;
+			width: 80px;
+			height: 80px;
+			text-align: center;
+			padding-top: 5px;
+		}
+		#tabs li.active{
+			border-bottom: 5px solid blue;
+		}
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		.hidden{
+			display: none;
+		}
+		.tab{
+			padding: 5px;
+		}
+		.accountHeader{
+			background: #333;
+			color: #FFF;
+			padding: 5px;
+		}
+		label, input[type=text]{
+			display: block;
+			margin-bottom: 5px;
+			width: 100%;
+		}
+		fieldset{
+			border: 0;
+			padding: 5px;
+			margin-top: 5px;
+		}
+		legend{
+			margin: 0;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1 class="hidden">
+		Preferences
+	</h1>
+	<div id="tabHolder">
+		<ul id="tabs">
+			<li data-id="accounts">
+				<img src="icons/preferences.png" />
+				Accounts
+			</li>
+		</ul>
+	</div>
+	<button onclick="document.location.href=document.location">refresh(DEBUG)</button>
+	<div id="accountsTab" class="tab">
+		<h2>Accounts</h2>
+		<ul id="accounts">
+			<li v-repeat="accounts">
+				<div class="accountHeader">
+					<img src="icons/new.png" />
+					{{ user.name }}
+				</div>
+				<form>
+					<fieldset>
+						<legend>Default API Keys</legend>
+						<div v-component="apiKeyEnter" v-with="default"></div>
+						<label>
+							<input type="checkbox" v-model="default.official" />
+							Official API
+						</label>
+					</fieldset>
+					<fieldset>
+						<legend>Posting API Keys</legend>
+						<label>
+							<input type="checkbox" v-model="use_posting" />
+							Use seperate API keys for posting
+						</label>
+						<div v-if="use_posting" v-component="apiKeyEnter" v-with="posting"></div>
+					</fieldset>
+				</form>
+			</li>
+		</ul>
+	</div>
+
+	<!-- Partial -->
+	<div id="apiKeyEnter" class="hidden">
+		<label>
+			Consumer Key
+			<input type="text" v-model="consumer_key" />
+		</label>
+		<label>
+			Consumer Secret
+			<input type="text" v-model="consumer_secret" />
+		</label>
+		<label>
+			Access Token
+			<input type="text" v-model="access_token" />
+		</label>
+		<label>
+			Access Secret
+			<input type="text" v-model="access_secret" />
+		</label>
+	</div>
+
+	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="../bower_components/vue/dist/vue.js"></script>
+	<script src="accounts.js"></script>
+	<script>
+		$("#tabs li:first-child").addClass("active");
+
+		Vue.component('apiKeyEnter', {
+			template: $("#apiKeyEnter").html()
+		})
+
+		var accounts = new Vue({
+			el: '#accounts',
+			data: {
+				accounts : window.accounts
+			},
+			ready : function(){
+				this.$watch("accounts", function(newValue){
+					setAccounts(newValue);
+				});
+			}
+		});
+
+	</script>
+</body>
+</html>

@@ -10,9 +10,22 @@
 </head>
 <body>
 <button onclick="document.location.href=document.location">refresh(DEBUG)</button>
-<tweem-composer></tweem-composer>
+<tweem-composer id="composer"></tweem-composer>
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script src="accounts.js"></script>
 <script>
+	window.addEventListener('polymer-ready', function(e) {
+		var composer = document.getElementById("composer");
+		composer.accounts = window.accounts;
+
+		composer.addEventListener("sentMessage", function(){
+			setTimeout(window.close, 400);
+		});
+
+		$(window).on("accountsUpdated", function(){
+			composer.accounts = window.accounts;
+		});
+	});
 	window.opener.postMessage("The user is 'bob' and the password is 'secret'",
 			"file://");
 </script>

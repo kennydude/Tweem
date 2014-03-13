@@ -1,34 +1,96 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<polymer-element name="tweem-composer" attributes="">
+<polymer-element name="tweem-composer" attributes="accounts">
 	<template>
 		<div class="tweet-composer">
 			<div class="account-chooser">
-				<img class="avatar" id="currentAvatar" />
-				<!-- todo: complete -->
+				<img class="avatar" src="{{ currentAccount.user.profile_image_url }}" id="currentAvatar" />
+				<div id="accountChooser" class="picker">
+					&#x25BC;
+				</div>
 			</div>
 			<div class="composer">
 				<textarea id="text"></textarea>
 				<div class="counter" id="counter">140</div>
+				<button id="submit">Tweet</button>
 			</div>
 		</div>
 	</template>
 	<script>
 		var twt = require("twitter-text");
+		var gui = require('nw.gui');
+
+
 		Polymer("tweem-composer",{
+			firstAccountChange : true,
 			ready : function(){
 				var self = this;
 				this.$.text.onkeyup = function(e){
 					self.$.counter.innerHTML = 140 - twt.getTweetLength(this.value);
 				};
 				$(this.$.text).on("keydown", function(e){
-					if(e.keyCode == 91 && (e.metaKey || e.ctrlKey)){
+					if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)){
 						console.log("SEND via Keyboard");
+						self.sendMessage();
 					}
 				});
 
-				setTimeout(function(){
+				this.$.submit.addEventListener("click", function(e){
+					e.preventDefault();
+					self.sendMessage();
+				});
+
+				this.$.accountChooser.addEventListener("click",function(e){
+					var l = $(this).offset();
+					self.accountMenu.popup(l.left+$(this).width(), l.top);
+				});
+
+				setTimeout(function(){ // Delay to ensure window is focused
 					self.$.text.focus();
 				}, 100);
+			},
+			accountsChanged : function(){
+				console.log("Accounts change");
+
+				var self = this;
+
+				if(this.firstAccountChange){
+					this.currentAccount = this.accounts[0];
+
+					this.firstAccountChange = false;
+				}
+
+				this.accountMenu = new gui.Menu();
+				for(var account in this.accounts){
+					account = this.accounts[account];
+
+					this.accountMenu.append(new gui.MenuItem({
+						label: account.user.screen_name,
+						click : function(){
+							self.currentAccount = account;
+						}
+					}));
+
+				}
+
+			},
+			sendMessage : function(){
+				var send_creds = this.currentAccount;
+
+				if(send_creds.use_posting){
+					send_creds = send_creds.posting;
+				} else{
+					send_creds = send_creds.default;
+				}
+
+				var tweet = {
+					text : this.$.text.value,
+					account : send_creds
+				};
+				var outbox = JSON.parse(localStorage['outbox'] || "[]");
+				outbox.push(tweet);
+				localStorage['outbox'] = JSON.stringify(outbox);
+
+				this.fire("sentMessage");
 			}
 		});
 	</script>
