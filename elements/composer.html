@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<polymer-element name="tweem-composer" attributes="accounts">
+<link rel="import" href="tweet.html" />
+<polymer-element name="tweem-composer" attributes="accounts replyTo">
 	<template>
+		<tweem-tweet id="replyToTweet" controls="false"></tweem-tweet>
 		<div class="tweet-composer">
 			<div class="account-chooser">
 				<img class="avatar" src="{{ currentAccount.user.profile_image_url }}" id="currentAvatar" />
@@ -19,10 +21,30 @@
 		var twt = require("twitter-text");
 		var gui = require('nw.gui');
 
+		function moveCursorToEnd(el) {
+			if (typeof el.selectionStart == "number") {
+				el.selectionStart = el.selectionEnd = el.value.length;
+			} else if (typeof el.createTextRange != "undefined") {
+				el.focus();
+				var range = el.createTextRange();
+				range.collapse(false);
+				range.select();
+			}
+		}
 
 		Polymer("tweem-composer",{
 			firstAccountChange : true,
+			replyToChanged : function(){
+				if(this.replyTo){
+					this.$.text.value = "@" + this.replyTo.user.screen_name + " ";
+					this.$.replyToTweet.style.display = "block";
+					moveCursorToEnd(this.$.text);
+				}
+				this.$.replyToTweet.tweet = this.replyTo;
+			},
 			ready : function(){
+				this.$.replyToTweet.style.display = "none";
+
 				var self = this;
 				this.$.text.onkeyup = function(e){
 					self.$.counter.innerHTML = 140 - twt.getTweetLength(this.value);
@@ -86,6 +108,11 @@
 					text : this.$.text.value,
 					account : send_creds
 				};
+
+				if(this.replyTo){
+					tweet['in_reply_to_status_id'] = this.replyTo.id_str;
+				}
+
 				var outbox = JSON.parse(localStorage['outbox'] || "[]");
 				outbox.push(tweet);
 				localStorage['outbox'] = JSON.stringify(outbox);

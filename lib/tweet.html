@@ -25,9 +25,19 @@
 		$(window).on("accountsUpdated", function(){
 			composer.accounts = window.accounts;
 		});
+
+		if(document.location.search == ""){
+			document.location.search = "?";
+		}
+		var qs = require("querystring"),
+			query = qs.parse(document.location.search.substr(1));
+
+		if(query.reply){
+			var replyTweet = JSON.parse(atob( query.reply ));
+			composer.replyTo = replyTweet;
+		}
+
 	});
-	window.opener.postMessage("The user is 'bob' and the password is 'secret'",
-			"file://");
 </script>
 </body>
 </html>

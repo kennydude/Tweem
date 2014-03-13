@@ -1,6 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="text.html" />
-<polymer-element name="tweem-tweet" attributes="tweet">
+<polymer-element name="tweem-tweet" attributes="tweet controls">
 	<template>
 		<div class="tweet">
 			<div class="tweetrow">
@@ -15,6 +15,11 @@
 					<tweem-text id="text"></tweem-text>
 				</div>
 			</div>
+			<template if="{{ controls }}">
+				<div class="controls">
+					<a id="replyToTweet">Reply</a>
+				</div>
+			</template>
 			<div class="sub">
 				via <span id="source"></span>
 			</div>
@@ -29,6 +34,7 @@
 		Polymer('tweem-tweet', {
 			retweeter : null,
 			retweeted : false,
+			controls: true,
 			tweetChanged: function() {
 				if(this.tweet.retweeted_status){
 					this.retweeted = true;
@@ -54,6 +60,14 @@
 				this.$.text.addEventListener("openUser", function(e){
 					self.fire("openUser", e.detail);
 				});
+
+				if(this.controls){
+					// Add control handlers
+					this.$.replyToTweet.addEventListener("click", function(){
+						var tw = window.open("lib/tweet.html?reply=" + btoa(JSON.stringify(self.tweet)), "_blank", "width=400,height=200");
+						tw.focus();
+					});
+				}
 			}
 		});
 	</script>
